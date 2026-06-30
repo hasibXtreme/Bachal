@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #chat-log { width: 100%; height: 300px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        #msg-input { width: 80%; padding: 8px; }
+        #msg-submit { width: 18%; padding: 8px; }
+    </style>
+</head>
+<body>
+    
+    <h1>Chat room</h1>
+    <div id="chat-log"></div>
+    <input type="text" id="msg-input" placeholder="type your message here...."> 
+    <button id="msg-submit">Send</button>
+
+    <script>
+        const ws_protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const chatsocket = new WebSocket(ws_protocol + window.location.host + '/ws/chat/');
+
+        chatsocket.onmessage = function(e){
+            chatsocket.onmessage = function(e){
+            console.log("Raw data received from server:", e.data); // This prints it to the console logs
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').innerHTML += (data.message + '<br>');
+           };
+        }
+
+        document.querySelector('#msg-submit').onclick = function(e){
+            const msginputdom = document.querySelector('#msg-input');
+            const message = msginputdom.value;
+
+            chatsocket.send(JSON.stringify({
+                'message':message
+            }))
+
+            msginputdom.value=''
+        }
+    </script>
+
+</body>
+</html>
